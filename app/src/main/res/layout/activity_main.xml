@@ -8,7 +8,9 @@
     android:background="@drawable/bg"
     tools:context="com.example.lenovo_g50_70.gobang.MainActivity">
 
+<!--数据临时存储和恢复，需要布局文件里给控件添加ID-->
     <com.example.lenovo_g50_70.gobang.ChessView
+        android:id="@+id/chess"
         android:layout_centerInParent="true"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
