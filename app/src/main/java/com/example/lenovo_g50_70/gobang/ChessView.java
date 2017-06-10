@@ -212,6 +212,7 @@ public class ChessView extends View {
 
     /**
      * 游戏结束时，显示对话框
+     *
      * @param text
      */
     private void GameOverDialog(String text) {
@@ -232,6 +233,12 @@ public class ChessView extends View {
 
                     }
                 });
+        builder.setNegativeButton("再来一局", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                reStart();
+            }
+        });
         builder.show();
     }
 
@@ -484,23 +491,34 @@ public class ChessView extends View {
     }
 
     //存储父类信息
-    private static final String INSTANCE="instance";
+    private static final String INSTANCE = "instance";
     //游戏结束
-    private static final String INSTANCE_GAME_OVER="instance_game_over";
+    private static final String INSTANCE_GAME_OVER = "instance_game_over";
     //白棋子
-    private static final String INSTANCE_WHITE_ARRAY="instance_white_array";
+    private static final String INSTANCE_WHITE_ARRAY = "instance_white_array";
     //黑棋子
-    private static final String INSTANCE_BLACK_ARRAY="instance_black_array";
+    private static final String INSTANCE_BLACK_ARRAY = "instance_black_array";
 
     @Override
     protected Parcelable onSaveInstanceState() {
         //存储临时数据
-        Bundle bundle =new Bundle();
-        bundle.putParcelable(INSTANCE,super.onSaveInstanceState());
-        bundle.putBoolean(INSTANCE_GAME_OVER,mIsGameOver);
-        bundle.putParcelableArrayList(INSTANCE_WHITE_ARRAY,mWhitePoints);
-        bundle.putParcelableArrayList(INSTANCE_BLACK_ARRAY,mBlackPoints);
+        Bundle bundle = new Bundle();
+        bundle.putParcelable(INSTANCE, super.onSaveInstanceState());
+        bundle.putBoolean(INSTANCE_GAME_OVER, mIsGameOver);
+        bundle.putParcelableArrayList(INSTANCE_WHITE_ARRAY, mWhitePoints);
+        bundle.putParcelableArrayList(INSTANCE_BLACK_ARRAY, mBlackPoints);
         return bundle;
+    }
+
+    /**
+     * 再来一局
+     */
+    public void reStart() {
+        mWhitePoints.clear();
+        mBlackPoints.clear();
+        mIsGameOver = false;
+        mIsWhiteWinner = false;
+        invalidate();
     }
 
     @Override
@@ -508,11 +526,11 @@ public class ChessView extends View {
         //恢复临时数据
 
         //判断state的类型
-        if(state instanceof Bundle){
+        if (state instanceof Bundle) {
             Bundle bundle = (Bundle) state;
-            mIsGameOver=bundle.getBoolean(INSTANCE_GAME_OVER);
-            mWhitePoints=bundle.getParcelableArrayList(INSTANCE_WHITE_ARRAY);
-            mBlackPoints=bundle.getParcelableArrayList(INSTANCE_BLACK_ARRAY);
+            mIsGameOver = bundle.getBoolean(INSTANCE_GAME_OVER);
+            mWhitePoints = bundle.getParcelableArrayList(INSTANCE_WHITE_ARRAY);
+            mBlackPoints = bundle.getParcelableArrayList(INSTANCE_BLACK_ARRAY);
             super.onRestoreInstanceState(bundle.getParcelable(INSTANCE));
             return;
         }
