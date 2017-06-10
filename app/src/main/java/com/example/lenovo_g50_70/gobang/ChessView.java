@@ -7,10 +7,16 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Point;
+import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.LinearLayoutCompat;
 import android.util.AttributeSet;
+import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,8 +43,8 @@ public class ChessView extends View {
     private float radioPieceOfLineHeight = 1.0f * 3 / 4;
 
     //存放用户点击棋盘的坐标
-    private List<Point> mWhitePoints = new ArrayList<>();
-    private List<Point> mBlackPoints = new ArrayList<>();
+    private ArrayList<Point> mWhitePoints = new ArrayList<>();
+    private ArrayList<Point> mBlackPoints = new ArrayList<>();
     //黑棋先手,轮到下棋的颜色
     private boolean mIsBlack = true;
 
@@ -209,10 +215,16 @@ public class ChessView extends View {
      * @param text
      */
     private void GameOverDialog(String text) {
+        LinearLayout layout = new LinearLayout(getContext());
+        TextView tv = new TextView(getContext());
+        tv.setText(text);
+        LinearLayout.LayoutParams pm = new LinearLayout.LayoutParams(LinearLayoutCompat.LayoutParams.WRAP_CONTENT, LinearLayoutCompat.LayoutParams.WRAP_CONTENT);
+        layout.addView(tv, pm);
+        layout.setGravity(Gravity.CENTER);
         //对话框的显示
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder.setTitle("游戏结束");
-        builder.setMessage(text);
+        builder.setView(layout);
         builder.setPositiveButton("确定",
                 new DialogInterface.OnClickListener() {
                     @Override
@@ -469,5 +481,41 @@ public class ChessView extends View {
             //画竖线
             canvas.drawLine(y, startX, y, endX, mPaint);
         }
+    }
+
+    //存储父类信息
+    private static final String INSTANCE="instance";
+    //游戏结束
+    private static final String INSTANCE_GAME_OVER="instance_game_over";
+    //白棋子
+    private static final String INSTANCE_WHITE_ARRAY="instance_white_array";
+    //黑棋子
+    private static final String INSTANCE_BLACK_ARRAY="instance_black_array";
+
+    @Override
+    protected Parcelable onSaveInstanceState() {
+        //存储临时数据
+        Bundle bundle =new Bundle();
+        bundle.putParcelable(INSTANCE,super.onSaveInstanceState());
+        bundle.putBoolean(INSTANCE_GAME_OVER,mIsGameOver);
+        bundle.putParcelableArrayList(INSTANCE_WHITE_ARRAY,mWhitePoints);
+        bundle.putParcelableArrayList(INSTANCE_BLACK_ARRAY,mBlackPoints);
+        return bundle;
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Parcelable state) {
+        //恢复临时数据
+
+        //判断state的类型
+        if(state instanceof Bundle){
+            Bundle bundle = (Bundle) state;
+            mIsGameOver=bundle.getBoolean(INSTANCE_GAME_OVER);
+            mWhitePoints=bundle.getParcelableArrayList(INSTANCE_WHITE_ARRAY);
+            mBlackPoints=bundle.getParcelableArrayList(INSTANCE_BLACK_ARRAY);
+            super.onRestoreInstanceState(bundle.getParcelable(INSTANCE));
+            return;
+        }
+        super.onRestoreInstanceState(state);
     }
 }
